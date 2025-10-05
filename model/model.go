@@ -6,6 +6,8 @@ type DashBoardData struct {
 	TotalOwed           float64
 	MaintenanceReqCount int
 	TotalMembers        int
+	CurrenctRevenue     float64
+	BillDataSummary     BillDataSummary
 }
 
 type PaymentData struct {
@@ -38,4 +40,10 @@ type MaintenanceData struct {
 	RequestDate string
 	Detail      string
 	Status      string
+}
+
+type BillDataSummary struct {
+	PayPercentage float64
+	PaidAmt       int
+	BillAmt       int
 }

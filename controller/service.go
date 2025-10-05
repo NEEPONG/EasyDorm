@@ -248,3 +248,53 @@ func GetAllMaintenanceRequests() []model.MaintenanceData {
 	}
 	return maintenanceRequests
 }
+
+func GetCurrentMonthRevenue() float64 {
+	db := getDb()
+	defer db.Close()
+	var revenue float64
+	err := db.QueryRow(`
+		SELECT SUM(r.price + p.electricBill + p.waterBill)
+		FROM payment p JOIN rooms r ON p.roomId = r.roomId
+		WHERE p.billStatus = 1 AND
+		YEAR(p.payDate) = YEAR(CURRENT_DATE()) AND 
+		MONTH(p.payDate) = MONTH(CURRENT_DATE());
+	`).Scan(&revenue)
+	if err != nil {
+		panic(err.Error())
+	}
+	return revenue
+}
+
+func GetBillingSummary() model.BillDataSummary {
+	db := getDb()
+	defer db.Close()
+	var summary model.BillDataSummary
+	err := db.QueryRow(`
+		SELECT (SUM(billStatus) * 100.0) / COUNT(*) AS OverallPaymentSuccessRate_Percent,
+		SUM(billStatus) AS TotalBillsPaid,
+		COUNT(*) AS TotalBillsIssued
+		FROM payment
+		WHERE
+		YEAR(payDate) = YEAR(CURRENT_DATE()) AND 
+		MONTH(payDate) = MONTH(CURRENT_DATE());
+	`).Scan(&summary.PayPercentage, &summary.PaidAmt, &summary.BillAmt)
+	if err != nil {
+		panic(err.Error())
+	}
+	return summary
+}
+
+func InsertRoom(roomNumber int, roomFloor int, roomType string, price float64) error {
+	db := getDb()
+	defer db.Close()
+
+	_, err := db.Exec(`
+		INSERT INTO rooms (roomId, roomFloor, roomType, price)
+		VALUES (?, ?, ?, ?);
+	`, roomNumber, roomFloor, roomType, price)
+	if err != nil {
+		return err
+	}
+	return nil
+}

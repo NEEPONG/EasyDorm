@@ -10,6 +10,8 @@ func main() {
 	http.HandleFunc("/", controller.LoginHandler)
 	http.HandleFunc("/doLogin", controller.LoginHandler)
 	http.HandleFunc("/rooms", controller.RoomManagementHandler)
+	http.HandleFunc("/rooms/add", controller.AddRoomPageHandler)
+	http.HandleFunc("/api/rooms/add", controller.AddRoom)
 	http.HandleFunc("/maintenance", controller.MaintenanceHandler)
 	http.HandleFunc("/tenants", controller.TenantManagementHandler)
 	http.HandleFunc("/billing", controller.BillingHandler)

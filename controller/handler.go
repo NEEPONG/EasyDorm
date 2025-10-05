@@ -3,6 +3,7 @@ package controller
 import (
 	"html/template"
 	"net/http"
+	"strconv"
 
 	model "dormitorymng/model"
 )
@@ -38,6 +39,8 @@ func DashboardHandler(w http.ResponseWriter, req *http.Request) {
 		MaintenanceReqCount: GetMaintenanceReqCount(),
 		TotalMembers:        GetToTalMembers(),
 		RoomCount:           GetAllRooms(),
+		CurrenctRevenue:     GetCurrentMonthRevenue(),
+		BillDataSummary:     GetBillingSummary(),
 	}
 
 	tmpl, err := template.ParseFiles("view/html/dashboard.html")
@@ -86,4 +89,33 @@ func MaintenanceHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	tmpl.Execute(w, listMaintenance)
+}
+
+func AddRoomPageHandler(w http.ResponseWriter, req *http.Request) {
+	tmpl, err := template.ParseFiles("view/html/addRooms.html")
+	if err != nil {
+		renderError(w, "เกิดข้อผิดพลาดในการโหลดหน้าบริการซ่อมบำรุง")
+		return
+	}
+	tmpl.Execute(w, nil)
+}
+
+func AddRoom(w http.ResponseWriter, req *http.Request) {
+
+	if req.Method != http.MethodPost {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	roomNumber, _ := strconv.Atoi(req.FormValue("room_number"))
+	roomFloor, _ := strconv.Atoi(req.FormValue("room_floor"))
+	roomType := req.FormValue("room_type")
+	price, _ := strconv.ParseFloat(req.FormValue("room_price"), 64)
+
+	err := InsertRoom(roomNumber, roomFloor, roomType, price)
+	if err != nil {
+		renderError(w, "เกิดข้อผิดพลาดในการเพิ่มห้องพัก: "+err.Error())
+		return
+	}
+	http.Redirect(w, req, "/rooms", http.StatusSeeOther)
 }
