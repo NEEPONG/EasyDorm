@@ -25,6 +25,7 @@ func main() {
 	http.HandleFunc("/tenants", controller.TenantManagementHandler)
 	http.HandleFunc("/tenants/add", controller.AddMemberPage)
 	http.HandleFunc("/api/members/add", controller.AddMemberHandler)
+	http.HandleFunc("/api/tenants/search", controller.TenantSearch)
 
 	// Billing management
 	http.HandleFunc("/billing", controller.BillingHandler)

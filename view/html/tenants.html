@@ -120,9 +120,30 @@
                 </button>
             </div>
 
-            <div class="mb-4 p-4 bg-white rounded-xl shadow-sm">
-                <input type="text" placeholder="ค้นหาด้วยชื่อ, เบอร์โทรศัพท์, หรือหมายเลขห้อง"
-                    class="w-full p-2 border border-gray-300 rounded-md">
+            <div class="mb-6 p-4 bg-white rounded-xl shadow-lg">
+                <form action="/api/tenants/search" method="GET" class="flex items-center space-x-4">
+
+                    <input type="text" name="q" id="search_query" placeholder="ค้นหาผู้เช่าด้วยชื่อหรือหมายเลขห้อง"
+                        class="flex-grow p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        required autocomplete="off">
+
+                    <button type="submit"
+                        class="bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+
+                    <a href="/tenants" class="text-gray-500 hover:text-gray-700 p-2 rounded-md transition duration-150">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </a>
+                </form>
             </div>
 
             <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
@@ -152,6 +173,7 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
+                        {{ if . }}
                         {{ range . }}
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ .MemberId }}
@@ -160,7 +182,6 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ .MemberTel }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ .MemberRoom }}</td>
-
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <a href="/tenants/detail/{{ .MemberId }}"
                                     class="text-blue-600 hover:text-blue-900 mr-4">แก้ไขข้อมูล</a>
@@ -169,8 +190,13 @@
                             </td>
                         </tr>
                         {{ end }}
-
+                        {{ else }}
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">ไม่มีข้อมูลสมาชิก</td>
+                        </tr>
+                        {{ end }}
                     </tbody>
+
                 </table>
             </div>
 

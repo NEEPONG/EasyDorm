@@ -437,3 +437,33 @@ func InsertMember(newMember model.MemberData) {
 		panic(err.Error())
 	}
 }
+
+func SearchTenants(keyword string) []model.MemberData {
+	db := getDb()
+	defer db.Close()
+	searchTerm := "%" + keyword + "%"
+
+	rows, err := db.Query(`
+        SELECT * FROM member WHERE memberName LIKE ? OR memberTel LIKE ? OR memberRoom LIKE ?;
+    `, searchTerm, searchTerm, searchTerm)
+
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	members := []model.MemberData{}
+
+	for rows.Next() {
+		var member model.MemberData
+
+		err := rows.Scan(&member.MemberId, &member.MemberName, &member.MemberTel, &member.MemberRoom)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		members = append(members, member)
+	}
+
+	return members
+}

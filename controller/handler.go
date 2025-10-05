@@ -71,6 +71,18 @@ func TenantManagementHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl.Execute(w, memberList)
 }
 
+func TenantSearch(w http.ResponseWriter, req *http.Request) {
+	query := req.FormValue("q")
+
+	var members []model.MemberData = SearchTenants(query)
+	tmpl, err := template.ParseFiles("view/html/tenants.html")
+	if err != nil {
+		renderError(w, "เกิดข้อผิดพลาดในการโหลดหน้าจัดการผู้เช่า")
+		return
+	}
+	tmpl.Execute(w, members)
+}
+
 func BillingHandler(w http.ResponseWriter, req *http.Request) {
 	var listPayment map[string][]model.PaymentData = GetPaymentData()
 	tmpl, err := template.ParseFiles("view/html/billing.html")

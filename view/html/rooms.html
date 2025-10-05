@@ -176,7 +176,7 @@
                     </thead>
 
                     <tbody class="bg-white divide-y divide-gray-200">
-
+                        {{ if or .true .false }}
                         {{ range .true }}
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ .RoomId }}</td>
@@ -193,9 +193,8 @@
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <form action="/rooms/edit" method="POST" class="inline">
                                     <input type="hidden" name="roomId" value="{{ .RoomId }}">
-                                    <button type="submit" class="text-indigo-600 hover:text-indigo-900 mr-4">
-                                        แก้ไข
-                                    </button>
+                                    <button type="submit"
+                                        class="text-indigo-600 hover:text-indigo-900 mr-4">แก้ไข</button>
                                 </form>
                             </td>
                         </tr>
@@ -217,15 +216,21 @@
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <form action="/rooms/edit" method="POST" class="inline">
                                     <input type="hidden" name="roomId" value="{{ .RoomId }}">
-                                    <button type="submit" class="text-indigo-600 hover:text-indigo-900 mr-4">
-                                        แก้ไข
-                                    </button>
+                                    <button type="submit"
+                                        class="text-indigo-600 hover:text-indigo-900 mr-4">แก้ไข</button>
                                 </form>
                             </td>
                         </tr>
                         {{ end }}
-
+                        {{ else }}
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                ไม่มีห้องให้แสดง
+                            </td>
+                        </tr>
+                        {{ end }}
                     </tbody>
+
                 </table>
             </div>
 
