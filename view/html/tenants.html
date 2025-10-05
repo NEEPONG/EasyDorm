@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการผู้เช่า | ระบบจัดการหอพัก</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -183,10 +184,13 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ .MemberTel }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ .MemberRoom }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="/tenants/detail/{{ .MemberId }}"
-                                    class="text-blue-600 hover:text-blue-900 mr-4">แก้ไขข้อมูล</a>
-                                <a href="/tenants/checkout/{{ .MemberId }}"
-                                    class="text-red-600 hover:text-red-900">แจ้งย้ายออก</a>
+                                <form action="/api/tenants/checkout" method="POST"
+                                    class="inline checkout-form">
+                                    <input type="hidden" name="tenantsId" value="{{ .MemberId }}">
+                                    <button type="submit" class="text-red-600 hover:text-red-900">
+                                        แจ้งย้ายออก
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         {{ end }}
@@ -209,6 +213,29 @@
             &copy; 2024 Easy-Dorm System. All rights reserved.
         </footer>
     </div>
+    <script>
+        // เลือกทุก form ที่มี class checkout-form
+        document.querySelectorAll('.checkout-form').forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault(); // ป้องกัน submit ก่อน
+
+                Swal.fire({
+                    title: 'คุณแน่ใจหรือไม่?',
+                    text: "เมื่อยืนยันแล้ว ข้อมูลทุกอย่างที่เกี่ยวข้องกับผู้เช่านี้ถูกลบ!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'ยืนยันย้ายออก',
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit(); // กดยืนยันแล้ว submit form
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

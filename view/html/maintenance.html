@@ -107,18 +107,12 @@
                 <h1 class="text-2xl font-bold text-gray-800">
                     รายการแจ้งซ่อมทั้งหมด
                 </h1>
-                <button onclick="window.location.href='/maintenance/add'"
-                    class="flex items-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg shadow-md transition duration-150">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    เพิ่มคำขอแจ้งซ่อม
-                </button>
             </div>
 
             <div class="mb-6 p-4 bg-white rounded-xl shadow-sm flex space-x-4">
                 <input type="text" placeholder="ค้นหาด้วยหมายเลขห้อง หรือชื่อผู้เช่า"
-                    class="w-full p-2 border border-gray-300 rounded-md">
-                <select class="p-2 border border-gray-300 rounded-md">
+                    class="w-full p-2 border border-gray-300 rounded-md" disabled>
+                <select class="p-2 border border-gray-300 rounded-md" disabled>
                     <option value="">สถานะทั้งหมด</option>
                     <option value="New">ใหม่</option>
                     <option value="In Progress">กำลังดำเนินการ</option>
@@ -152,34 +146,60 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ .MemberName }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ .RequestDate }}</td>
                             <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{{ .Detail }}</td>
-                            
+
                             <td class="px-6 py-4 whitespace-nowrap">
                                 {{ if eq .Status "Pending" }}
-                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                <span
+                                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                                     {{ .Status }}
                                 </span>
                                 {{ else if eq .Status "In Progress" }}
-                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                <span
+                                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
                                     {{ .Status }}
                                 </span>
                                 {{ else if eq .Status "Completed" }}
-                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                <span
+                                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                     {{ .Status }}
                                 </span>
                                 {{ else }}
-                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                <span
+                                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
                                     {{ .Status }}
                                 </span>
                                 {{ end }}
                             </td>
 
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="/maintenance/view/{{ .RoomId }}/{{ .RequestDate }}"
-                                    class="text-indigo-600 hover:text-indigo-900 mr-4">จัดการ/ดูรายละเอียด</a>
+
+                                <form action="/maintenance/update_status" method="POST"
+                                    class="inline-flex items-center space-x-2">
+
+                                    <input type="hidden" name="roomId" value="{{ .RoomId }}">
+                                    <input type="hidden" name="requestDate" value="{{ .RequestDate }}">
+
+                                    <select name="status"
+                                        class="block w-full text-sm border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-1.5 **text-gray-800 bg-white**">
+
+                                        <option value="Pending" {{ if eq .Status "Pending" }}selected{{ end }}>Pending
+                                            (รอตรวจสอบ)</option>
+                                        <option value="In Progress" {{ if eq .Status "In Progress" }}selected{{ end }}>
+                                            In Progress (กำลังดำเนินการ)</option>
+                                        <option value="Completed" {{ if eq .Status "Completed" }}selected{{ end }}>
+                                            Completed (เสร็จสิ้น)</option>
+                                    </select>
+
+                                    <button type="submit"
+                                        class="inline-flex justify-center py-1.5 px-3 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150">
+                                        อัปเดต
+                                    </button>
+
+                                </form>
                             </td>
                         </tr>
                         {{ end }}
-                        
+
                     </tbody>
                 </table>
                 {{ if not .listMaintenance }}

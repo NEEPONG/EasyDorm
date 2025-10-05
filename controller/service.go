@@ -3,6 +3,7 @@ package controller
 import (
 	"database/sql"
 	model "dormitorymng/model"
+	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -168,13 +169,21 @@ func GetPaymentData() map[string][]model.PaymentData {
 	db := getDb()
 	defer db.Close()
 	paidRows, err := db.Query(`
-		SELECT r.roomId, p.payDate, r.price, p.electricBill, p.waterBill, 
-		p.billStatus, p.electricBill+p.waterBill+r.price
-		FROM rooms r LEFT JOIN member m ON r.roomId = m.memberRoom
+		SELECT 
+		r.roomId, 
+		MAX(p.payDate) AS payDate,
+		r.price, 
+		MAX(p.electricBill) AS electricBill,
+		MAX(p.waterBill) AS waterBill,
+		MAX(p.billStatus) AS billStatus,
+		MAX(p.electricBill)+MAX(p.waterBill)+r.price AS total
+		FROM rooms r
+		LEFT JOIN member m ON r.roomId = m.memberRoom
 		LEFT JOIN payment p ON r.roomId = p.roomId
-		AND DATE_FORMAT(p.payDate, '%Y-%m') = '2025-10'
+			AND DATE_FORMAT(p.payDate, '%Y-%m') = '2025-10'
 		WHERE m.memberId IS NOT NULL
-		AND p.billStatus = 1;
+		AND p.billStatus = 1
+		GROUP BY r.roomId, r.price;
 	`)
 	if err != nil {
 		panic(err.Error())
@@ -193,13 +202,21 @@ func GetPaymentData() map[string][]model.PaymentData {
 	}
 
 	unPaidRows, err := db.Query(`
-		SELECT r.roomId, p.payDate, r.price, p.electricBill, p.waterBill, 
-		p.billStatus, p.electricBill+p.waterBill+r.price
-		FROM rooms r LEFT JOIN member m ON r.roomId = m.memberRoom
+		SELECT 
+		r.roomId, 
+		MAX(p.payDate) AS payDate,
+		r.price, 
+		MAX(p.electricBill) AS electricBill,
+		MAX(p.waterBill) AS waterBill,
+		MAX(p.billStatus) AS billStatus,
+		MAX(p.electricBill)+MAX(p.waterBill)+r.price AS total
+		FROM rooms r
+		LEFT JOIN member m ON r.roomId = m.memberRoom
 		LEFT JOIN payment p ON r.roomId = p.roomId
-		AND DATE_FORMAT(p.payDate, '%Y-%m') = '2025-10'
+			AND DATE_FORMAT(p.payDate, '%Y-%m') = '2025-10'
 		WHERE m.memberId IS NOT NULL
-		AND p.billStatus = 1;
+		AND p.billStatus = 0
+		GROUP BY r.roomId, r.price;
 	`)
 	if err != nil {
 		panic(err.Error())
@@ -466,4 +483,96 @@ func SearchTenants(keyword string) []model.MemberData {
 	}
 
 	return members
+}
+
+func RemoveTenants(tenantId int) error {
+	db := getDb()
+	defer db.Close()
+
+	// เริ่ม transaction
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	// ลบจาก maintenance
+	_, err = tx.Exec("DELETE FROM maintenance WHERE memberId = ?", tenantId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// ลบจาก payment
+	_, err = tx.Exec("DELETE FROM payment WHERE memberId = ?", tenantId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// ลบจาก member
+	_, err = tx.Exec("DELETE FROM member WHERE memberId = ?", tenantId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// commit transaction
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UpdateBillStatus(roomId int, payDate string) error {
+	db := getDb()
+	defer db.Close()
+
+	query := `
+        UPDATE payment
+        SET billStatus = 1
+        WHERE roomId = ? AND payDate = ?
+    `
+
+	result, err := db.Exec(query, roomId, payDate)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("ไม่พบบิลสำหรับ roomId %d และ payDate %s", roomId, payDate)
+	}
+
+	return nil
+}
+
+func UpdateMaintenanceStatus(roomId int, requestDate string, newStatus string) error {
+	db := getDb()
+	defer db.Close()
+
+	query := `
+		UPDATE maintenance
+		SET 
+			status = ?
+		WHERE 
+			roomId = ? 
+			AND date = ?; 
+	`
+
+	result, err := db.Exec(query, newStatus, roomId, requestDate)
+	if err != nil {
+		return fmt.Errorf("error executing update query: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("error getting rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("ไม่พบรายการแจ้งซ่อมสำหรับห้อง %d และวันที่ %s หรือสถานะไม่เปลี่ยนแปลง", roomId, requestDate)
+	}
+
+	return nil
 }

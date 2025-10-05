@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการบิล | ระบบจัดการหอพัก</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -107,21 +108,12 @@
                 <h1 class="text-2xl font-bold text-gray-800">
                     จัดการใบแจ้งหนี้และการชำระเงิน
                 </h1>
-                <button onclick="window.location.href='/billing/generate'"
-                    class="flex items-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-md transition duration-150">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 13h6m-3-3v6m-9 1 7 7 10-10"></path>
-                    </svg>
-                    สร้างบิลประจำเดือน
-                </button>
             </div>
 
             <div class="mb-6 p-4 bg-white rounded-xl shadow-sm flex space-x-4">
                 <input type="text" placeholder="ค้นหาด้วยหมายเลขห้อง หรือวันที่"
-                    class="w-full p-2 border border-gray-300 rounded-md">
-                <select class="p-2 border border-gray-300 rounded-md">
+                    class="w-full p-2 border border-gray-300 rounded-md" disabled>
+                <select class="p-2 border border-gray-300 rounded-md" disabled>
                     <option value="">ทั้งหมด</option>
                     <option value="0">ยังไม่จ่าย</option>
                     <option value="1">จ่ายแล้ว</option>
@@ -171,10 +163,13 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="/billing/edit/{{ .RoomId }}/{{ .BillDate }}"
-                                    class="text-indigo-600 hover:text-indigo-900 mr-4">แก้ไขบิล</a>
-                                <a href="/billing/record/{{ .RoomId }}/{{ .BillDate }}"
-                                    class="text-green-600 hover:text-green-900">บันทึกจ่ายแล้ว</a>
+                                <form action="/api/billing/edit" method="POST" class="inline billing-form">
+                                    <input type="hidden" value="{{ .RoomId }}" name="roomId">
+                                    <input type="hidden" value="{{ .BillDate }}" name="billDate">
+                                    <button type="submit" class="text-green-600 hover:text-green-900">
+                                        บันทึกจ่ายแล้ว
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         {{ end }}
@@ -222,8 +217,7 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="/billing/view/{{ .RoomId }}/{{ .BillDate }}"
-                                    class="text-blue-600 hover:text-blue-900 mr-4">ดูใบเสร็จ</a>
+                                <a href="#" class="text-blue-600 hover:text-blue-900 mr-4">ดูใบเสร็จ</a>
                             </td>
                         </tr>
                         {{ end }}
@@ -243,6 +237,25 @@
             &copy; 2024 Easy-Dorm System. All rights reserved.
         </footer>
     </div>
+    <script>
+        document.querySelectorAll('.billing-form').forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault(); // หยุด submit ชั่วคราว
+
+                // แสดง SweetAlert เสร็จสิ้น
+                Swal.fire({
+                    title: 'สำเร็จ!',
+                    text: 'บันทึกการชำระเงินเรียบร้อยแล้ว',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    // หลังจาก alert ปิดแล้ว submit form จริง ๆ
+                    form.submit();
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

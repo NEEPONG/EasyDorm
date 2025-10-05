@@ -2,6 +2,7 @@ package controller
 
 import (
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -103,6 +104,32 @@ func MaintenanceHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl.Execute(w, listMaintenance)
 }
 
+func MaintenanceStatusChange(w http.ResponseWriter, req *http.Request) {
+	if req.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	roomId, err := strconv.Atoi(req.FormValue("roomId"))
+	if err != nil {
+		http.Error(w, "Invalid Room ID format", http.StatusBadRequest)
+		return
+	}
+
+	requestDate := req.FormValue("requestDate")
+	status := req.FormValue("status")
+
+	err = UpdateMaintenanceStatus(roomId, requestDate, status)
+
+	if err != nil {
+		log.Printf("Error updating maintenance status: %v", err)
+		http.Error(w, "เกิดข้อผิดพลาดในการอัปเดตสถานะการแจ้งซ่อม: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, req, "/maintenance", http.StatusSeeOther)
+}
+
 func AddRoomPageHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := template.ParseFiles("view/html/api/addRooms.html")
 	if err != nil {
@@ -199,4 +226,21 @@ func AddMemberHandler(w http.ResponseWriter, req *http.Request) {
 	InsertMember(member)
 
 	http.Redirect(w, req, "/tenants", http.StatusSeeOther)
+}
+
+func TenantCheckout(w http.ResponseWriter, req *http.Request) {
+	tenantsId, _ := strconv.Atoi(req.FormValue("tenantsId"))
+
+	RemoveTenants(tenantsId)
+
+	http.Redirect(w, req, "/tenants", http.StatusSeeOther)
+}
+
+func BillingConfirm(w http.ResponseWriter, req *http.Request) {
+	roomId, _ := strconv.Atoi(req.FormValue("roomId"))
+	billDate := req.FormValue("billDate")
+
+	UpdateBillStatus(roomId, billDate)
+
+	http.Redirect(w, req, "/billing", http.StatusSeeOther)
 }

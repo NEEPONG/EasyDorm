@@ -20,15 +20,18 @@ func main() {
 
 	// Mantenance management
 	http.HandleFunc("/maintenance", controller.MaintenanceHandler)
+	http.HandleFunc("/maintenance/update_status", controller.MaintenanceStatusChange)
 
 	// Tenant management
 	http.HandleFunc("/tenants", controller.TenantManagementHandler)
 	http.HandleFunc("/tenants/add", controller.AddMemberPage)
 	http.HandleFunc("/api/members/add", controller.AddMemberHandler)
 	http.HandleFunc("/api/tenants/search", controller.TenantSearch)
+	http.HandleFunc("/api/tenants/checkout", controller.TenantCheckout)
 
 	// Billing management
 	http.HandleFunc("/billing", controller.BillingHandler)
+	http.HandleFunc("/api/billing/edit", controller.BillingConfirm)
 
 	// Dashboard management
 	http.HandleFunc("/dashboard", controller.DashboardHandler)
