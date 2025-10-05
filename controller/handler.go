@@ -77,3 +77,13 @@ func BillingHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	tmpl.Execute(w, listPayment)
 }
+
+func MaintenanceHandler(w http.ResponseWriter, req *http.Request) {
+	var listMaintenance []model.MaintenanceData = GetAllMaintenanceRequests()
+	tmpl, err := template.ParseFiles("view/html/maintenance.html")
+	if err != nil {
+		renderError(w, "เกิดข้อผิดพลาดในการโหลดหน้าบริการซ่อมบำรุง")
+		return
+	}
+	tmpl.Execute(w, listMaintenance)
+}

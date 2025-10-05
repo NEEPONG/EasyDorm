@@ -223,3 +223,28 @@ func GetPaymentData() map[string][]model.PaymentData {
 	}
 	return listPayment
 }
+
+func GetAllMaintenanceRequests() []model.MaintenanceData {
+	db := getDb()
+	defer db.Close()
+	rows, err := db.Query(`
+		SELECT m.memberName, ma.roomId, ma.date, ma.text, ma.status FROM maintenance ma
+		INNER JOIN member m ON ma.memberId = m.memberId
+		ORDER BY ma.status, ma.roomId
+	`)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	var maintenanceRequests []model.MaintenanceData
+	for rows.Next() {
+		var request model.MaintenanceData
+		err := rows.Scan(&request.MemberName, &request.RoomId, &request.RequestDate, &request.Detail, &request.Status)
+		if err != nil {
+			panic(err.Error())
+		}
+		maintenanceRequests = append(maintenanceRequests, request)
+	}
+	return maintenanceRequests
+}

@@ -31,3 +31,11 @@ type MemberData struct {
 	MemberTel  string
 	MemberRoom int
 }
+
+type MaintenanceData struct {
+	MemberName  string
+	RoomId      int
+	RequestDate string
+	Detail      string
+	Status      string
+}
