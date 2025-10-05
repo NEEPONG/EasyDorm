@@ -106,63 +106,59 @@
         <main class="p-6 flex justify-center items-center min-h-screen pt-12">
 
             <div class="max-w-xl w-full">
-                <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">🏠 เพิ่มห้องพักใหม่</h1>
+                <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">🧑 เพิ่มผู้ใช้ ใหม่</h1>
 
                 <div class="bg-white p-8 rounded-xl shadow-lg">
 
-                    <p class="text-lg font-semibold text-gray-700 mb-4">กรอกรายละเอียดห้องพัก</p>
+                    <p class="text-lg font-semibold text-gray-700 mb-4">กรอกรายละเอียดผู้ใช้</p>
 
-                    <form action="/api/rooms/add" method="POST" class="space-y-6">
+                    <form action="/api/members/add" method="POST" class="space-y-6">
 
+                        <!-- ชื่อผู้เช่า -->
                         <div>
-                            <label for="room_number" class="block text-sm font-medium text-gray-700">หมายเลขห้อง</label>
+                            <label for="member_name" class="block text-sm font-medium text-gray-700">ชื่อผู้เช่า</label>
                             <div class="mt-1">
-                                <input type="text" name="room_number" id="room_number" required
+                                <input type="text" name="member_name" id="member_name" required
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
+                                    placeholder="เช่น นายสมชาย ใจดี">
+                            </div>
+                            <p class="mt-2 text-xs text-gray-500">กรอกชื่อ-นามสกุลของผู้เช่าให้ครบถ้วน</p>
+                        </div>
+
+                        <!-- เบอร์โทรศัพท์ -->
+                        <div>
+                            <label for="member_tel"
+                                class="block text-sm font-medium text-gray-700">เบอร์โทรศัพท์</label>
+                            <div class="mt-1">
+                                <input type="tel" name="member_tel" id="member_tel" required pattern="[0-9]{10}"
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
+                                    placeholder="เช่น 0812345678">
+                            </div>
+                            <p class="mt-2 text-xs text-gray-500">กรอกหมายเลขโทรศัพท์ 10 หลัก</p>
+                        </div>
+
+                        <!-- ห้องที่พัก -->
+                        <div>
+                            <label for="member_room"
+                                class="block text-sm font-medium text-gray-700">หมายเลขห้องพัก</label>
+                            <div class="mt-1">
+                                <input type="text" name="member_room" id="member_room" required
                                     class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
                                     placeholder="เช่น 101, 205">
                             </div>
-                            <p class="mt-2 text-xs text-gray-500">ระบุหมายเลขหรือรหัสห้องที่ไม่ซ้ำกัน</p>
+                            <p class="mt-2 text-xs text-gray-500">กรอกหมายเลขห้องที่ผู้เช่าพักอยู่</p>
                         </div>
 
-                        <div>
-                            <label for="room_floor" class="block text-sm font-medium text-gray-700">ชั้นที่ตั้ง</label>
-                            <div class="mt-1">
-                                <input type="number" name="room_floor" id="room_floor" required min="1"
-                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
-                                    placeholder="เช่น 1, 2, 3">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="room_type" class="block text-sm font-medium text-gray-700">ประเภทห้องพัก</label>
-                            <div class="mt-1">
-                                <select id="room_type" name="room_type" required
-                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border bg-white">
-                                    <option value="" disabled>-- เลือกประเภทห้อง --</option>
-                                    <option value="ห้องธรรมดา" selected>ห้องธรรมดา</option>
-                                    <option value="ห้องแอร์">ห้องแอร์</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="room_price" class="block text-sm font-medium text-gray-700">ราคาค่าเช่าต่อเดือน
-                                (บาท)</label>
-                            <div class="mt-1">
-                                <input type="number" name="room_price" id="room_price" required min="1" step="0.01"
-                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
-                                    placeholder="เช่น 3500.00">
-                            </div>
-                            <p class="mt-2 text-xs text-gray-500">ต้องกรอกราคาค่าเช่าเพื่อใช้ในการออกบิล</p>
-                        </div>
-
+                        <!-- ปุ่มบันทึก -->
                         <div class="pt-5">
                             <button type="submit"
                                 class="w-full justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
-                                บันทึกข้อมูลห้องใหม่
+                                บันทึกข้อมูลผู้เช่าใหม่
                             </button>
                         </div>
+
                     </form>
+
                 </div>
             </div>
         </main>
@@ -171,7 +167,7 @@
     <footer class="p-4 bg-white border-t mt-20 text-center text-sm text-gray-500 md:pl-0">
         &copy; 2024 Dorm Manager System. All rights reserved.
     </footer>
-    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.querySelector("form");

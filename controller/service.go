@@ -365,3 +365,75 @@ func SearchRooms(keyword string) map[string][]model.RoomStatus {
 
 	return listRoom
 }
+
+func GetRoomById(id int) model.RoomData {
+	db := getDb()
+	defer db.Close()
+	var room model.RoomData
+	err := db.QueryRow(`
+		SELECT * FROM rooms WHERE roomId = ?;
+	`, id).Scan(&room.RoomId, &room.RoomFloor, &room.Price, &room.RoomType)
+	if err != nil {
+		panic(err.Error())
+	}
+	return room
+}
+
+func UpdateRoomById(newRoom model.RoomData) error {
+	db := getDb()
+	defer db.Close()
+
+	query := `
+		UPDATE rooms
+		SET
+			roomFloor = ?,
+			roomType  = ?,
+			price     = ?
+		WHERE roomId = ?
+	`
+
+	_, err := db.Exec(query,
+		newRoom.RoomFloor,
+		newRoom.RoomType,
+		newRoom.Price,
+		newRoom.RoomId,
+	)
+	if err != nil {
+		panic(err.Error())
+	}
+	return nil
+}
+
+func GetMaxMemberId() int {
+	db := getDb()
+	defer db.Close()
+
+	var maxId int
+	err := db.QueryRow(`
+		SELECT MAX(memberId) + 1 FROM member;
+	`).Scan(&maxId)
+	if err != nil {
+		panic(err.Error())
+	}
+	return maxId
+
+}
+
+func InsertMember(newMember model.MemberData) {
+	db := getDb()
+	defer db.Close()
+
+	query := `
+		INSERT INTO member (memberId, memberName, memberTel, memberRoom) VALUES(?, ?, ?, ?);
+	`
+
+	_, err := db.Exec(query,
+		GetMaxMemberId(),
+		newMember.MemberName,
+		newMember.MemberTel,
+		newMember.MemberRoom,
+	)
+	if err != nil {
+		panic(err.Error())
+	}
+}

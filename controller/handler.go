@@ -130,3 +130,61 @@ func SearchRoomHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	tmpl.Execute(w, mapRoomData)
 }
+
+func RoomEditPage(w http.ResponseWriter, req *http.Request) {
+	roomId, _ := strconv.Atoi(req.FormValue("roomId"))
+
+	room := GetRoomById(roomId)
+	tmpl, err := template.ParseFiles("view/html/api/editRooms.html")
+	if err != nil {
+		renderError(w, "เกิดข้อผิดพลาดในการโหลดหน้าจัดการห้องพัก")
+		return
+	}
+
+	tmpl.Execute(w, room)
+}
+
+func RoomEditHandler(w http.ResponseWriter, req *http.Request) {
+	roomId, _ := strconv.Atoi(req.FormValue("room_number"))
+	roomFloor, _ := strconv.Atoi(req.FormValue("room_floor"))
+	roomType := req.FormValue("room_type")
+	roomPrice, _ := strconv.ParseFloat(req.FormValue("room_price"), 64)
+
+	Data := model.RoomData{
+		RoomId:    roomId,
+		RoomFloor: roomFloor,
+		RoomType:  roomType,
+		Price:     roomPrice,
+	}
+
+	UpdateRoomById(Data)
+
+	http.Redirect(w, req, "/rooms", http.StatusSeeOther)
+}
+
+func AddMemberPage(w http.ResponseWriter, req *http.Request) {
+	tmpl, err := template.ParseFiles("view/html/api/addMember.html")
+	if err != nil {
+		renderError(w, "เกิดข้อผิดพลาดในการโหลดหน้าจัดการห้องพัก")
+		return
+	}
+
+	tmpl.Execute(w, nil)
+}
+
+func AddMemberHandler(w http.ResponseWriter, req *http.Request) {
+	memName := req.FormValue("member_name")
+	memTel := req.FormValue("member_tel")
+	memRoom, _ := strconv.Atoi(req.FormValue("member_room"))
+
+	member := model.MemberData{
+		MemberId:   0,
+		MemberName: memName,
+		MemberTel:  memTel,
+		MemberRoom: memRoom,
+	}
+
+	InsertMember(member)
+
+	http.Redirect(w, req, "/tenants", http.StatusSeeOther)
+}
