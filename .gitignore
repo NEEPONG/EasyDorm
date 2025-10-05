@@ -1,0 +1,6 @@
+# Ignore Go debug binary
+__debug_bin*
+
+# Ignore Go module files
+go.mod
+go.sum
