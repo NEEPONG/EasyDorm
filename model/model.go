@@ -47,3 +47,11 @@ type BillDataSummary struct {
 	PaidAmt       int
 	BillAmt       int
 }
+
+type RoomStatus struct {
+	RoomId     int
+	RoomFloor  int
+	Price      float64
+	RoomType   string
+	IsOccupied string
+}

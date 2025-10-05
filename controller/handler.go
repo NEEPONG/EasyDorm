@@ -92,7 +92,7 @@ func MaintenanceHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func AddRoomPageHandler(w http.ResponseWriter, req *http.Request) {
-	tmpl, err := template.ParseFiles("view/html/addRooms.html")
+	tmpl, err := template.ParseFiles("view/html/api/addRooms.html")
 	if err != nil {
 		renderError(w, "เกิดข้อผิดพลาดในการโหลดหน้าบริการซ่อมบำรุง")
 		return
@@ -118,4 +118,15 @@ func AddRoom(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	http.Redirect(w, req, "/rooms", http.StatusSeeOther)
+}
+
+func SearchRoomHandler(w http.ResponseWriter, req *http.Request) {
+	searchId, _ := strconv.Atoi(req.FormValue("q"))
+	mapRoomData := SearchRooms(strconv.Itoa(searchId))
+	tmpl, err := template.ParseFiles("view/html/rooms.html")
+	if err != nil {
+		renderError(w, "เกิดข้อผิดพลาดในการโหลดหน้าจัดการห้องพัก")
+		return
+	}
+	tmpl.Execute(w, mapRoomData)
 }

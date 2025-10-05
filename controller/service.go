@@ -298,3 +298,70 @@ func InsertRoom(roomNumber int, roomFloor int, roomType string, price float64) e
 	}
 	return nil
 }
+
+func SearchRooms(keyword string) map[string][]model.RoomStatus {
+	db := getDb()
+	defer db.Close()
+	searchTerm := "%" + keyword + "%"
+
+	rows, err := db.Query(`
+        SELECT 
+		r.roomId, 
+		r.roomFloor, 
+		r.price, 
+		r.roomType,
+		IF(COUNT(m.memberRoom) > 0, 'มีผู้เช่า', 'ว่าง') AS RoomStatus 
+		FROM 
+			rooms r
+		LEFT JOIN 
+			member m ON r.roomId = m.memberRoom
+		WHERE 
+			r.roomId LIKE ? OR r.price LIKE ? OR r.roomFloor LIKE ?
+		GROUP BY
+			r.roomId, r.roomFloor, r.price, r.roomType
+		ORDER BY
+			r.roomId;
+    `, searchTerm, searchTerm, searchTerm)
+
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	occupiedRooms := []model.RoomStatus{}
+	unoccupiedRooms := []model.RoomStatus{}
+
+	// 4. ลูปเพื่อสแกนและแยกประเภทห้อง
+	for rows.Next() {
+		var room model.RoomStatus
+		var status string // ประกาศตัวแปรเพื่อรับค่าสถานะห้อง
+
+		// ต้องสแกนค่า status ที่ดึงมาจาก SQL Query ด้วย!
+		err := rows.Scan(&room.RoomId, &room.RoomFloor, &room.Price, &room.RoomType, &status)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		// กำหนดสถานะลงในโครงสร้าง (ถ้ามี)
+		room.IsOccupied = status
+
+		// แยกห้องตามสถานะ
+		if status == "มีผู้เช่า" {
+			occupiedRooms = append(occupiedRooms, room)
+		} else {
+			unoccupiedRooms = append(unoccupiedRooms, room)
+		}
+	}
+
+	if err := rows.Err(); err != nil {
+		panic(err.Error())
+	}
+
+	// 5. ส่งค่ากลับเป็น map[string][]model.RoomData ตามรูปแบบที่ต้องการ
+	listRoom := map[string][]model.RoomStatus{
+		"true":  occupiedRooms,
+		"false": unoccupiedRooms,
+	}
+
+	return listRoom
+}
