@@ -1,76 +1,63 @@
-# EasyDorm
+# Dormitory Management System
 
-EasyDorm is a **basic dormitory management system for administrators (Admin side)**. This project was developed as part of a **Golang class assignment**, focusing on simplicity and fundamental concepts of backend web development.
-
-The goal of this project is to practice building a web application using **Golang**, connecting to **MySQL**, and rendering views with **basic HTML**.
-
-## Objectives
-
-* Practice web application development using Golang
-* Learn how to connect and interact with a MySQL database
-* Understand basic backend structure (handlers, routes, logic)
-* Use basic HTML for frontend rendering
-* Apply classroom concepts in a real mini-project
+A web-based application for managing dormitory operations including rooms, tenants, maintenance, and billing.
 
 ## Features
 
-* Dormitory management (basic information)
-* Room management
-* Tenant management (basic level)
-* Admin-side system only
-
-> Note: This project is intended for learning purposes. It does not include advanced features such as authentication, payment systems, or user roles.
+- **User Authentication**: Secure login system for administrators.
+- **Dashboard**: Overview of dormitory status.
+- **Room Management**:
+  - Add new rooms.
+  - Edit existing room details.
+  - Search for rooms.
+- **Tenant Management**:
+  - Register new tenants.
+  - Search for tenant information.
+  - Handle tenant checkout.
+- **Maintenance**:
+  - Track maintenance requests.
+  - Update maintenance status.
+- **Billing**:
+  - Manage billing cycles.
+  - Confirm billing details.
 
 ## Tech Stack
 
-* **Backend:** Golang
-* **Database:** MySQL
-* **Frontend:** Basic HTML
-* **Tools:** Go standard library
+- **Backend**: Go (Golang)
+- **Database**: MySQL
+- **Frontend**: HTML, CSS, JavaScript
 
-## Installation
+## Setup Instructions
 
-1. Clone the repository
+1.  **Clone the repository**
 
-```bash
-git clone https://github.com/your-username/EasyDorm.git
-cd EasyDorm
-```
+    ```bash
+    git clone <repository-url>
+    cd DormitoryMng
+    ```
 
-2. Configure MySQL database
+2.  **Prerequisites**
 
-* Create a MySQL database
-* Update database credentials in the project configuration
+    - Go 1.24 or higher
+    - MySQL Server
 
-3. Run the application
+3.  **Database Configuration**
 
-```bash
-go run main.go
-```
+    - Create a MySQL database for the project.
+    - Import the initial schema (if available).
+    - _Note: Update the database connection string in the code (e.g., in `model/model.go` or `controller/service.go`) to match your local MySQL credentials._
 
-4. Open your browser and access
+4.  **Install Dependencies**
 
-```
-http://localhost:8080
-```
+    ```bash
+    go mod tidy
+    ```
 
-## Project Scope
+5.  **Run the Application**
 
-* Admin-side only
-* Designed for academic and learning purposes
-* Simple structure for easy understanding and extension
+    ```bash
+    go run main.go
+    ```
 
-## Future Improvements
-
-* Authentication system
-* Better UI with CSS framework
-* Role-based access control
-* Payment and billing features
-
-## Author
-
-Developed by EasyDorm team (Student Project)
-
----
-
-This project is part of a Golang course assignment and is not intended for production use.
+6.  **Access the Application**
+    - Open your web browser and navigate to: `http://localhost:8090`
